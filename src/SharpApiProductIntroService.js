@@ -5,6 +5,15 @@ const { SharpApiCoreService, SharpApiJobTypeEnum } = require('@sharpapi/sharpapi
  */
 class SharpApiProductIntroService extends SharpApiCoreService {
   /**
+   * Creates a new SharpApiProductIntroService instance
+   * @param {string} apiKey - Your SharpAPI API key
+   * @param {string} [apiBaseUrl='https://sharpapi.com/api/v1'] - API base URL
+   */
+  constructor(apiKey, apiBaseUrl = 'https://sharpapi.com/api/v1') {
+    super(apiKey, apiBaseUrl, '@sharpapi/sharpapi-node-product-intro/1.0.1');
+  }
+
+  /**
    * Generates a shorter version of the product description.
    * Provide as many details and parameters of the product to get the best marketing introduction possible.
    * Comes in handy with populating product catalog data and bulk products processing.
