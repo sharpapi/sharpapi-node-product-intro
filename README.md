@@ -2,12 +2,12 @@
 
 # Product Intro Generator API for Node.js
 
-## 🛍️ Generate compelling product introductions — powered by SharpAPI AI.
+## 🎁 Generate compelling product introductions — powered by SharpAPI AI.
 
 [![npm version](https://img.shields.io/npm/v/@sharpapi/sharpapi-node-product-intro.svg)](https://www.npmjs.com/package/@sharpapi/sharpapi-node-product-intro)
 [![License](https://img.shields.io/npm/l/@sharpapi/sharpapi-node-product-intro.svg)](https://github.com/sharpapi/sharpapi-node-client/blob/master/LICENSE.md)
 
-**SharpAPI Product Intro Generator** creates engaging, conversion-focused product introductions that highlight key features and benefits. Perfect for e-commerce, marketing, and product pages.
+**SharpAPI Product Intro Generator** creates engaging, concise product introductions that capture attention and highlight key features. Perfect for product listings and marketing materials.
 
 ---
 
@@ -18,7 +18,10 @@
 3. [Usage](#usage)
 4. [API Documentation](#api-documentation)
 5. [Examples](#examples)
-6. [License](#license)
+6. [Use Cases](#use-cases)
+7. [API Endpoint](#api-endpoint)
+8. [Related Packages](#related-packages)
+9. [License](#license)
 
 ---
 
@@ -51,29 +54,23 @@ const { SharpApiProductIntroService } = require('@sharpapi/sharpapi-node-product
 const apiKey = process.env.SHARP_API_KEY; // Store your API key in environment variables
 const service = new SharpApiProductIntroService(apiKey);
 
-const productName = 'Wireless RGB Gaming Mouse';
-const features = [
-  '16000 DPI optical sensor',
-  'Customizable RGB lighting',
-  'Ergonomic design',
-  '8 programmable buttons'
-];
+const productInfo = { name: 'Smart Watch', features: ['GPS', 'Heart Rate Monitor'] };
 
-async function generateIntro() {
+async function processText() {
   try {
-    // Submit intro generation job
-    const statusUrl = await service.generateProductIntro(productName, features, 'English');
+    // Submit processing job
+    const statusUrl = await service.generateProductIntro(productInfo);
     console.log('Job submitted. Status URL:', statusUrl);
 
     // Fetch results (polls automatically until complete)
     const result = await service.fetchResults(statusUrl);
-    console.log('Generated intro:', result.getResultJson());
+    console.log('Result:', result.getResultJson());
   } catch (error) {
     console.error('Error:', error.message);
   }
 }
 
-generateIntro();
+processText();
 ```
 
 ---
@@ -82,166 +79,51 @@ generateIntro();
 
 ### Methods
 
-#### `generateProductIntro(productName: string, features: string[], language?: string, voiceTone?: string, context?: string, maxLength?: number): Promise<string>`
-
-Generates a compelling product introduction based on features.
+The service provides methods for processing content asynchronously. All methods return a status URL for polling results.
 
 **Parameters:**
-- `productName` (string, required): The name of the product
-- `features` (array, required): List of product features and benefits
-- `language` (string, optional): Output language (default: 'English')
-- `voiceTone` (string, optional): Tone of voice (e.g., 'Professional', 'Casual', 'Enthusiastic')
-- `context` (string, optional): Additional context about target audience or use case
-- `maxLength` (number, optional): Maximum length in words (default: 100)
+- `content` (string, required): The content to process
+- `language` (string, optional): Output language
+- `voice_tone` (string, optional): Desired tone (e.g., professional, casual)
+- `context` (string, optional): Additional context for better results
 
-**Returns:**
-- Promise<string>: Status URL for polling the job result
-
-**Example:**
-```javascript
-const statusUrl = await service.generateProductIntro(
-  'Smart Fitness Watch',
-  ['Heart rate monitoring', 'GPS tracking', '7-day battery'],
-  'English',
-  'Enthusiastic',
-  'Target audience: fitness enthusiasts aged 25-40'
-);
-const result = await service.fetchResults(statusUrl);
-```
+For complete API specifications, see the [Postman Documentation](https://documenter.getpostman.com/view/31106842/2sBXVeGsa7).
 
 ### Response Format
 
-The API returns a professionally crafted product introduction:
-
-```json
-{
-  "product_intro": "Elevate your game with our Wireless RGB Gaming Mouse. Featuring a precision 16000 DPI optical sensor and customizable RGB lighting, this ergonomic powerhouse puts victory at your fingertips. With 8 programmable buttons, customize your gameplay and dominate the competition.",
-  "word_count": 42,
-  "tone": "Enthusiastic"
-}
-```
+The API returns structured JSON data. Response format varies by endpoint - see documentation for details.
 
 ---
 
 ## Examples
 
-### Basic Product Intro
+### Basic Example
 
 ```javascript
 const { SharpApiProductIntroService } = require('@sharpapi/sharpapi-node-product-intro');
 
 const service = new SharpApiProductIntroService(process.env.SHARP_API_KEY);
 
-const product = 'Premium Noise-Canceling Headphones';
-const features = [
-  'Active noise cancellation',
-  '40-hour battery life',
-  'Bluetooth 5.0',
-  'Comfortable over-ear design'
-];
+// Customize polling behavior if needed
+service.setApiJobStatusPollingInterval(10);  // Poll every 10 seconds
+service.setApiJobStatusPollingWait(180);     // Wait up to 3 minutes
 
-service.generateProductIntro(product, features)
-  .then(statusUrl => service.fetchResults(statusUrl))
-  .then(result => {
-    const intro = result.getResultJson();
-    console.log('📝 Product Introduction:');
-    console.log(intro.product_intro);
-  })
-  .catch(error => console.error('Generation failed:', error));
+// Use the service
+// ... (implementation depends on specific service)
 ```
 
-### Tone-Specific Intro
-
-```javascript
-const service = new SharpApiProductIntroService(process.env.SHARP_API_KEY);
-
-const productName = 'Professional Chef Knife Set';
-const features = [
-  'High-carbon stainless steel',
-  'Ergonomic handles',
-  'Full-tang construction',
-  'Includes 8 essential knives'
-];
-
-const statusUrl = await service.generateProductIntro(
-  productName,
-  features,
-  'English',
-  'Professional',
-  'Target audience: professional chefs and culinary students',
-  80
-);
-
-const result = await service.fetchResults(statusUrl);
-console.log('Professional intro:', result.getResultJson().product_intro);
-```
-
-### Batch Product Intro Generation
-
-```javascript
-const service = new SharpApiProductIntroService(process.env.SHARP_API_KEY);
-
-const products = [
-  {
-    name: 'Smart Water Bottle',
-    features: ['Hydration tracking', 'Temperature sensor', 'LED reminders']
-  },
-  {
-    name: 'Yoga Mat Pro',
-    features: ['Extra thick cushioning', 'Non-slip surface', 'Eco-friendly']
-  },
-  {
-    name: 'Portable Blender',
-    features: ['USB rechargeable', 'BPA-free', 'One-touch operation']
-  }
-];
-
-const intros = await Promise.all(
-  products.map(async (product) => {
-    const statusUrl = await service.generateProductIntro(
-      product.name,
-      product.features,
-      'English',
-      'Enthusiastic'
-    );
-    const result = await service.fetchResults(statusUrl);
-    return {
-      product: product.name,
-      intro: result.getResultJson().product_intro
-    };
-  })
-);
-
-intros.forEach(item => {
-  console.log(`\n${item.product}:`);
-  console.log(item.intro);
-});
-```
+For more examples, visit the [Product Page](https://sharpapi.com/en/catalog/ai/e-commerce/product-intro-generator).
 
 ---
 
 ## Use Cases
 
-- **E-commerce Product Pages**: Create compelling product descriptions
-- **Marketing Campaigns**: Generate attention-grabbing product pitches
-- **Email Marketing**: Craft product introductions for newsletters
-- **Social Media**: Create engaging product posts
-- **Catalog Creation**: Auto-generate introductions for large product catalogs
-- **A/B Testing**: Generate multiple versions for conversion testing
-- **Marketplace Listings**: Optimize product listings on marketplaces
-
----
-
-## Voice Tones
-
-Choose from various voice tones to match your brand:
-
-- **Professional**: Formal, authoritative, business-focused
-- **Casual**: Friendly, conversational, approachable
-- **Enthusiastic**: Energetic, exciting, motivational
-- **Luxury**: Sophisticated, premium, exclusive
-- **Technical**: Detailed, specification-focused, precise
-- **Humorous**: Lighthearted, fun, entertaining
+- **Product Listings**: Create attention-grabbing opening lines
+- **Email Marketing**: Generate product previews for campaigns
+- **Social Media**: Create compelling product teasers
+- **Catalog Pages**: Add engaging introductions to products
+- **Landing Pages**: Craft persuasive product headlines
+- **Marketplace Optimization**: Stand out with better product intros
 
 ---
 
@@ -257,10 +139,9 @@ For detailed API specifications, refer to:
 
 ## Related Packages
 
-- [@sharpapi/sharpapi-node-product-description](https://www.npmjs.com/package/@sharpapi/sharpapi-node-product-description) - Full product descriptions
-- [@sharpapi/sharpapi-node-product-categories](https://www.npmjs.com/package/@sharpapi/sharpapi-node-product-categories) - Product categorization
-- [@sharpapi/sharpapi-node-seo-tags](https://www.npmjs.com/package/@sharpapi/sharpapi-node-seo-tags) - SEO optimization
-- [@sharpapi/sharpapi-node-client](https://www.npmjs.com/package/@sharpapi/sharpapi-node-client) - Full SharpAPI SDK
+- [@sharpapi/sharpapi-node-product-description](https://www.npmjs.com/package/@sharpapi/sharpapi-node-product-description)
+- [@sharpapi/sharpapi-node-product-categories](https://www.npmjs.com/package/@sharpapi/sharpapi-node-product-categories)
+- [@sharpapi/sharpapi-node-thank-you-email](https://www.npmjs.com/package/@sharpapi/sharpapi-node-thank-you-email)
 
 ---
 
